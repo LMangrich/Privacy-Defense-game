@@ -26,6 +26,8 @@ map_image = pg.image.load("assets/images/levels/FirstLevel.png").convert_alpha()
 #buttons
 base_for_buying = pg.image.load("assets/images/buttons/ContornoMapaApenas.png").convert_alpha()
 buy_first_turret = pg.image.load("assets/images/buttons/Torre1AntiVirus.png").convert_alpha()
+information_button = pg.image.load("assets/images/buttons/InformationButton.png").convert_alpha()
+pause_button = pg.image.load("assets/images/buttons/PauseButton.png").convert_alpha()
 
 #load json data for level
 with open("assets/images/levels/FirstLevel.json") as file:
@@ -92,6 +94,8 @@ enemy_group.add(enemy) #instead of append, use add
 
 base_buying = Button(0, 0, base_for_buying, True)
 first_turret = Button(259, 20, buy_first_turret, True)
+information = Button(cons.SCREEN_WIDTH - 37, 8, information_button, True) #TODO acrescentar funcionalidade
+pause = Button(cons.SCREEN_WIDTH - 37, 50, pause_button, True) #TODO acresentar funcionalidade
 
 ############################# --> EXPLAINING CHARACTERS
 
@@ -118,6 +122,8 @@ while run:
     #draw level
     world.draw(screen)
     base_buying.draw(screen)
+    information.draw(screen)
+    pause.draw(screen)
 
     if game_paused:
         #draw first character
