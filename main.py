@@ -93,6 +93,20 @@ enemy_group.add(enemy) #instead of append, use add
 base_buying = Button(0, 0, base_for_buying, True)
 first_turret = Button(259, 20, buy_first_turret, True)
 
+############################# --> EXPLAINING CHARACTERS
+
+#load image
+first_character = pg.image.load("assets/images/characters/leticia.png").convert_alpha()
+
+game_paused = True
+
+def show_instructions():
+    font = pg.font.Font(None, 36)
+    text = font.render("Clique para começar", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.SCREEN_HEIGHT // 2))
+    screen.blit(text, text_rect)
+
+
 ############################# --> GAME START
 #game loop
 run = True
@@ -103,37 +117,46 @@ while run:
 
     #draw level
     world.draw(screen)
-
-    #update groups
-    enemy_group.update() #para lidar com vários inimigos
-    turret_group.update(enemy_group)
-    projectile_group.update()
-
-    #hilight selected turret
-    if selected_turret:
-        selected_turret.selected = True
-
-    #draw groups -> para aparecer na tela
-    enemy_group.draw(screen)
-    for turret in turret_group:
-        turret.draw(screen)
-
-    projectile_group.draw(screen)
-
-    #buttons
     base_buying.draw(screen)
 
-    if first_turret.draw(screen):
-        placing_turrets = True
-    if placing_turrets:
-        #show cursor turret
-        cursor_rect = buy_first_turret.get_rect()
-        cursor_pos = pg.mouse.get_pos()
-        cursor_rect.center = cursor_pos
-        if cursor_pos[1] >= cons.UPPER_PANEL:
-            screen.blit(buy_first_turret, cursor_rect)
-        if pg.mouse.get_pressed()[2] == 1: #se clicar com o botão direito cancela
-            placing_turrets = False
+    if game_paused:
+        #draw first character
+        screen.blit(first_character, (0, cons.SCREEN_HEIGHT - 120))
+        show_instructions()
+        #show information when click
+        if pg.mouse.get_pressed()[0] == 1:
+            game_paused = False #return game
+    else:
+
+        #update groups
+        enemy_group.update() #para lidar com vários inimigos
+        turret_group.update(enemy_group)
+        projectile_group.update()
+
+        #hilight selected turret
+        if selected_turret:
+            selected_turret.selected = True
+
+        #draw groups -> para aparecer na tela
+        enemy_group.draw(screen)
+        for turret in turret_group:
+            turret.draw(screen)
+
+        projectile_group.draw(screen)
+
+        #buttons
+
+        if first_turret.draw(screen):
+            placing_turrets = True
+        if placing_turrets:
+            #show cursor turret
+            cursor_rect = buy_first_turret.get_rect()
+            cursor_pos = pg.mouse.get_pos()
+            cursor_rect.center = cursor_pos
+            if cursor_pos[1] >= cons.UPPER_PANEL:
+                screen.blit(buy_first_turret, cursor_rect)
+            if pg.mouse.get_pressed()[2] == 1: #se clicar com o botão direito cancela
+                placing_turrets = False
 
     #event handler, lida com eventos em um for loop
     for event in pg.event.get():
