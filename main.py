@@ -6,9 +6,11 @@ from classes.enemy_impl.enemy import Enemy
 from classes.world_impl.world import World
 from classes.turret_impl.turret import Turret
 from classes.buttons_impl.button import Button
+from classes.character_impl.character_dialogue import CharacterDialogue
 
 from initialize.images.load_images import LoadImages
 from initialize.game_variables.start_variables import GameVariables
+
 
 #############################
 # PYGAME LIB START
@@ -47,13 +49,12 @@ images = LoadImages()
 #############################
 
 # load json data for level
-with open("assets/images/levels/firstLevel.json") as file:
+with open("assets/images/levels/firstLevel.json") as file: #TODO por as coordenadas de onde por as torres aqui
     world_data = json.load(file)
 
 # create world_impl
 world = World(world_data, images.map_image, images.headerMap, cons)
 world.process_data()
-
 
 #############################
 # TURRET
@@ -112,15 +113,42 @@ pause = Button(cons.SCREEN_WIDTH - 37, 50, images.pause_button, True)  # TODO ac
 # EXPLAINING GAME
 #############################
 
+dialogue = CharacterDialogue(images.character_one, images.footer_image, 90, cons.SCREEN_HEIGHT - 8, 480, cons.SCREEN_HEIGHT - 10, True, cons)
+
 game_paused = True
 
+def show_instructions(): #TODO ver sobre o texto
+    font = pg.font.Font(None, 36)
+    text = font.render("Clique para começar", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.SCREEN_HEIGHT // 2))
+    screen.blit(text, text_rect)
 
-# def show_instructions():
-#     font = pg.font.Font(None, 36)
-#     text = font.render("Clique para começar", True, (255, 255, 255))
-#     text_rect = text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.SCREEN_HEIGHT // 2))
-#     screen.blit(text, text_rect)
+def load_character_dialogues():
+    with open("classes/character_impl/character_dialogue_data.json") as file:
+        data = json.load(file)
+    return data
 
+def showInstructionsFirstPart():
+    dialogue_data = load_character_dialogues()
+
+    for dialogue in dialogue_data:
+        dialogue_id = dialogue['dialogue_id']
+        dialogue_text = dialogue['dialogue']
+
+        if dialogue_id == '6':
+            break
+
+        # Renderiza o texto do diálogo atual na tela
+        font = pg.font.Font(None, 36)
+        text_surface = font.render(dialogue_text, True, (255, 255, 255))
+        text_rect = text_surface.get_rect(
+            bottomright=(300, 300))
+
+        wait_for_click = True
+        while wait_for_click:
+            for event in pg.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                    wait_for_click = False
 
 #############################
 # GAME START
@@ -139,8 +167,13 @@ while run:
 
     if game_paused:
         # draw first character_impl
-        screen.blit(images.footer_image, (0, cons.SCREEN_HEIGHT - 105))
-        screen.blit(images.character_one, (-10, cons.SCREEN_HEIGHT - 103))
+
+        dialogue.draw(screen)
+
+        show_instructions()
+        #showInstructionsFirstPart()
+
+
 
         # show information when click
         if pg.mouse.get_pressed()[0] == 1:
@@ -190,6 +223,10 @@ while run:
                     create_turret(mouse_pos)
                 else:
                     game_variables.selected_turret = select_turret(mouse_pos)
+                # Mostrar instruções se o jogo estiver em modo de explicação
+                if game_paused and dialogue.game_explication:
+                    dialogue.showInstructionsFirstPart()
+
     # update display
     pg.display.flip()
 

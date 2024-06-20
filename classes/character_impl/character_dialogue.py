@@ -1,4 +1,5 @@
 import pygame as pg
+import json
 
 
 class CharacterDialogue(pg.sprite.Sprite):
@@ -26,13 +27,34 @@ class CharacterDialogue(pg.sprite.Sprite):
 
         # Text
         self.font = pg.font.Font(None, 36)
-        self.text = text
-        self.text_surface = self.font.render(self.text, True, (255, 255, 255))
-        self.text_rect = self.text_surface.get_rect(
-            bottomright=(self.coordinate_x_footer + 10, self.coordinate_y_footer + 10))
+        self.text_surface = None  # Inicializa como None
+
+    def load_character_dialogues(self):
+        with open("classes/character_impl/character_dialogue_data.json") as file:
+            data = json.load(file)
+        return data
+    def showInstructionsFirstPart(self):
+        self.dialogue_data = self.load_character_dialogues()
+
+        for dialogue in self.dialogue_data:
+            dialogue_id = dialogue['dialogue_id']
+            dialogue_text = dialogue['dialogue']
+
+            if dialogue_id == '6':
+                break
+
+            # Renderiza o texto do diálogo atual na tela
+            self.text_surface = self.font.render(dialogue_text, True, (255, 255, 255))
+            self.text_rect = self.text_surface.get_rect(bottomright=(self.coordinate_x_footer + 10, self.coordinate_y_footer + 10))
+
+            wait_for_click = True
+            while wait_for_click:
+                for event in pg.event.get():
+                    if event.type == pg.MOUSEBUTTONDOWN and event.button ==1:
+                            wait_for_click = False
 
     def draw(self, surface):
         if self.game_explication:
             surface.blit(self.image_footer, self.rect_footer)
             surface.blit(self.image_character, self.rect_character)
-            surface.blit(self.text_surface, self.text_rect)
+            #surface.blit(self.text_surface, self.text_rect)
