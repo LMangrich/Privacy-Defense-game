@@ -1,0 +1,36 @@
+CHARACTER_DIALOGUE_DATA = [
+    {
+        "dialogue_id": 1,
+        "dialogue": "Bem vindo ao Privacy Defender, onde seu objetivo é defender a sua privacidade de ameaças que querem comprometê-la!",
+    },
+    {
+        "dialogue_id": 2,
+        "dialogue": "Aqui são onde ficarão suas torres de defesa contra seus dados. São as medidas gerais! Proteções que ajudam a assegurar sua privacidade na maioria dos casos./n" +
+                    "Comece com elas para criar uma base de proteção sólida antes que os ataques específicos cheguem ao seu computador."
+    },
+    {
+        "dialogue_id": 3,
+        "dialogue": "Nesta primeira torre de defesa podemos identificar o Antivírus, que nos ajudam a detectar intrusos maliciosos em nossas máquinas e a erradicar essas ameaças./n" +
+        "Essa medida de segurança é fundamental para a construção de um ambiente seguro."
+    },
+    {
+        "dialogue_id": 4,
+        "dialogue": "Já na segunda torre de defesa, temos a Atualização de Software. Manter os softwares atualizados garante que novos métodos de proteção sejam postos em funcionamento./n"+
+        "Além disso, aumenta as chances de vulnerabilidades antigas já terem sido descobertas e corrigidas."
+    },
+    {
+        "dialogue_id": 5,
+        "dialogue": "Na terceira torre, observamos a Educação Computacional. Ter uma boa educação quando se trata de utilizar meios tecnológicos é fundamental para evitar a invasão de sua privacidade./n" +
+        "Essa medida tomada pelo usuário vai desde não clicar em links suspeitos até não expor dados e informações sigilosas em redes sociais. É importante lembrar que a internet não é completamente confidencial e anônima!"
+    },
+    {
+        "dialogue_id": 6,
+        "dialogue": "Vemos nossa primeira ameaça, o Phising! Phishing é como são chamadas as tentativas de conseguir suas informações sigilosas, como senhas ou informações bancárias por meio de engenharia social./n"+
+        "A engenharia social seria se passar por pessoas em que você confia ou por instituições de renome. Por isso sempre desconfie de um e-mail ou mensagem pedindo suas informações pessoais/n" +
+        "É melhor prevenir do que remediar!"
+    },
+    {
+        "dialogue_id": 7,
+        "dialogue": "Oh não! O Phising acabou chegando até os computador! Para evitar que isso aconteça, basta posicionar suas torres no mapa e eliminar a ameaça!"
+    },
+]

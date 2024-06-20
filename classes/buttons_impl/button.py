@@ -1,6 +1,7 @@
 import pygame as pg
 
-class Button():
+
+class Button:
     def __init__(self, x, y, image, single_click):
         self.image = image
         self.rect = self.image.get_rect()
@@ -10,19 +11,19 @@ class Button():
 
     def draw(self, surface):
         action = False
-        #get mouse position
+        # get mouse position
         pos = pg.mouse.get_pos()
-        #check mouseover and clicked conditions
+        # check mouseover and clicked conditions
         if self.rect.collidepoint(pos):
             if pg.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 action = True
-                #if button is a sigle click type, then set clicked to True
+                # if buttons_impl is a sigle click type, then set clicked to True
                 if self.single_click:
                     self.clicked = True
 
             if pg.mouse.get_pressed()[0] == 0:
                 self.clicked = False
-        #draw button on screen
+        # draw buttons_impl on screen
         surface.blit(self.image, self.rect)
 
         return action

@@ -1,12 +1,10 @@
 import pygame as pg
-import constants as cons
 import math
-from projectile import Projectile
-from turret_data import TURRET_DATA
 
+from .turret_data import TURRET_DATA
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, image, tile_x, tile_y, projectile_group):
+    def __init__(self, image, tile_x, tile_y, constants, images):
         pg.sprite.Sprite.__init__(self)
         self.check_turret = 1
         self.range = TURRET_DATA[self.check_turret - 1].get("range")
@@ -14,14 +12,16 @@ class Turret(pg.sprite.Sprite):
         self.selected = False
         self.target = None
         self.last_shot = pg.time.get_ticks()
+        self.cons = constants
+        self.images = images
 
-        # position variables
+        # position game_variables
         self.tile_x = tile_x
         self.tile_y = tile_y
 
         # calculate center coordinates
-        self.x = (self.tile_x + 0.5) * cons.TILE_SIZE  # para ficar no centro do tile
-        self.y = (self.tile_y + 0.35) * cons.TILE_SIZE
+        self.x = (self.tile_x + 0.5) * self.cons.TILE_SIZE  # para ficar no centro do tile
+        self.y = (self.tile_y + 0.35) * self.cons.TILE_SIZE
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
@@ -35,8 +35,8 @@ class Turret(pg.sprite.Sprite):
         self.range_rect = self.range_image.get_rect()
         self.range_rect.center = self.rect.center
 
-        # reference to projectiles
-        self.projectile_group = projectile_group
+
+
 
     def update(self, enemy_group):
         # if target picked, play firing animation
@@ -45,20 +45,14 @@ class Turret(pg.sprite.Sprite):
         else:
             if pg.time.get_ticks() - self.last_shot > self.cooldown:
                 self.pick_target(enemy_group)
-    #TODO arrumar sobre fire projectile
-    def fire_projectile(self):
-        # create and add a projectile to the group
-        if self.target:
-            new_projectile = Projectile(self.rect.centerx, self.rect.centery, self.target.rect.centerx,
-                                        self.target.rect.centery)
-            self.projectile_group.add(new_projectile)
-            self.target = None
+
+    #TODO arrumar sobre fire projectile_impl
 
     def pick_target(self, enemy_group):
-        # find an enemy to target
+        # find an enemy_impl to target
         x_dist = 0
         y_dist = 0
-        # check distance to each enemy to see if it is in range
+        # check distance to each enemy_impl to see if it is in range
         for enemy in enemy_group:
             x_dist = enemy.pos[0] - self.x
             y_dist = enemy.pos[1] - self.y
