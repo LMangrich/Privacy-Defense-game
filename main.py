@@ -107,7 +107,7 @@ enemy_group.add(phishing_enemy)  # instead of append, use add
 
 first_turret = Button(259, 20, images.first_turret, True)
 information = Button(cons.SCREEN_WIDTH - 37, 8, images.information_button, True)  # TODO acrescentar funcionalidade
-pause = Button(cons.SCREEN_WIDTH - 37, 50, images.pause_button, True)  # TODO acresentar funcionalidade
+pause = Button(cons.SCREEN_WIDTH - 37, 45, images.pause_button, True)  # TODO acresentar funcionalidade
 
 #############################
 # EXPLAINING GAME
@@ -172,8 +172,6 @@ while run:
 
         show_instructions()
         #showInstructionsFirstPart()
-
-
 
         # show information when click
         if pg.mouse.get_pressed()[0] == 1:
