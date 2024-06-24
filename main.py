@@ -202,7 +202,7 @@ while run:
         #turret_group[0].draw(screen)
         # show information when click
         if pg.mouse.get_pressed()[0] == 1:
-          game_paused = False  # return game
+            pass #game_paused = False  # return game
 
     else:
 
