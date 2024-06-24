@@ -113,7 +113,7 @@ pause = Button(cons.SCREEN_WIDTH - 37, 45, images.pause_button, True)  # TODO ac
 # EXPLAINING GAME
 #############################
 
-dialogue = CharacterDialogue(images.character_one, images.footer_image, 90, cons.SCREEN_HEIGHT - 8, 480, cons.SCREEN_HEIGHT - 10, True, cons)
+dialogue = CharacterDialogue(images.character_one, images.footer_image, 90, cons.SCREEN_HEIGHT - 8, 480, cons.SCREEN_HEIGHT - 10, True, cons, images.first_turret, images.first_turret, images.first_turret)
 
 game_paused = True
 
@@ -154,6 +154,16 @@ def showInstructionsFirstPart():
 # GAME START
 #############################
 
+# with open("classes/character_impl/character_dialogue_data.json") as file:
+#     speech_data = json.load(file)
+#
+# speeches = []
+#
+# for speech in speech_data:
+#     speeches.append(speech["dialogue"])
+
+indice_texto = 0
+
 run = True
 while run:
     clock.tick(cons.FPS)  # 60 fps
@@ -170,12 +180,30 @@ while run:
 
         dialogue.draw(screen)
 
-        show_instructions()
-        #showInstructionsFirstPart()
+        font = pg.font.Font(None, 28)
+        text = font.render("Bem vindo ao Privacy Defender, onde seu objetivo é defender a sua privacidade", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(575, 550))
+        screen.blit(text, text_rect)
 
+        # Segundo pedaço do texto
+        text2 = font.render("de ameaças que querem comprometê-la!", True, (255, 255, 255))
+        text2_rect = text2.get_rect(center=(490, 590))
+        screen.blit(text2, text2_rect)
+
+        if pg.mouse.get_pressed()[0] == 1:
+            # Segundo pedaço do texto
+            text3 = font.render("ALO", True, (255, 255, 255))
+            text3_rect = text3.get_rect(center=(490, 590))
+            screen.blit(text3, text3_rect)
+        #TODO arrumar a fala
+        #TODO por uma seta
+
+
+        #turret_group[0].draw(screen)
         # show information when click
         if pg.mouse.get_pressed()[0] == 1:
-            game_paused = False  # return game
+          game_paused = False  # return game
+
     else:
 
         # update groups
@@ -221,9 +249,9 @@ while run:
                     create_turret(mouse_pos)
                 else:
                     game_variables.selected_turret = select_turret(mouse_pos)
-                # Mostrar instruções se o jogo estiver em modo de explicação
-                if game_paused and dialogue.game_explication:
-                    dialogue.showInstructionsFirstPart()
+                # # Mostrar instruções se o jogo estiver em modo de explicação
+                # if game_paused and dialogue.game_explication:
+                #     dialogue.showInstructionsFirstPart()
 
     # update display
     pg.display.flip()

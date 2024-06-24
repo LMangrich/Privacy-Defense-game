@@ -5,11 +5,11 @@
     },
     {
         "dialogue_id": 2,
-        "dialogue": "Aqui são onde ficarão suas torres de defesa contra seus dados. São as medidas gerais! Proteções que ajudam a assegurar sua privacidade na maioria dos casos./nComece com elas para criar uma base de proteção sólida antes que os ataques específicos cheguem ao seu computador."
+        "dialogue": "Aqui são onde ficarão suas torres de defesa contra seus dados. São as medidas gerais! Proteções que ajudam a assegurar sua privacidade na maioria dos casos.\nComece com elas para criar uma base de proteção sólida antes que os ataques específicos cheguem ao seu computador."
     },
     {
         "dialogue_id": 3,
-        "dialogue": "Nesta primeira torre de defesa podemos identificar o Antivírus, que nos ajudam a detectar intrusos maliciosos em nossas máquinas e a erradicar essas ameaças./nEssa medida de segurança é fundamental para a construção de um ambiente seguro."
+        "dialogue": "Nesta primeira torre de defesa podemos identificar o Antivírus, que nos ajudam a detectar intrusos maliciosos em nossas máquinas e a erradicar essas ameaças.\nEssa medida de segurança é fundamental para a construção de um ambiente seguro."
     },
     {
         "dialogue_id": 4,

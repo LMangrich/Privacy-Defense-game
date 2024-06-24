@@ -21,6 +21,7 @@ class LoadImages(pg.sprite.Sprite):
 
         # Enemy images
         self.phishing_enemy = pg.image.load("assets/images/enemies/phishingEnemy.png").convert_alpha()
+        self.phishing_enemy_bigger_size = pg.image.load("assets/images/enemies/phishingEnemy.png").convert_alpha()
 
         # Buttons
         self.header_for_buying = pg.image.load("assets/images/buttons/headerMap.png").convert_alpha()
