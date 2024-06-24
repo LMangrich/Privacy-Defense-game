@@ -1,5 +1,6 @@
 import pygame as pg
 import json
+import time
 
 from constants.constants import Constants
 from classes.enemy_impl.enemy import Enemy
@@ -10,7 +11,7 @@ from classes.character_impl.character_dialogue import CharacterDialogue
 
 from initialize.images.load_images import LoadImages
 from initialize.game_variables.start_variables import GameVariables
-
+from util import split_speech_into_lines
 
 #############################
 # PYGAME LIB START
@@ -121,16 +122,16 @@ game_paused = True
 # GAME START
 #############################
 
-with open("classes/character_impl/character_dialogue_data.json") as file:
+with open("classes/character_impl/character_dialogue_data.json", encoding="utf-8") as file:
     speech_data = json.load(file)
 
-speeches = []
+speeches_queue = []
 
 for speech in speech_data:
-    speeches.append(speech["dialogue"])
+    speeches_queue.append(speech["dialogue"])
 
 indice_texto = 0
-
+mouse_is_pressed = True
 run = True
 while run:
     clock.tick(cons.FPS)  # 60 fps
@@ -142,37 +143,44 @@ while run:
     information.draw(screen)
     pause.draw(screen)
 
-    if game_paused:
-        # draw first character_impl
+    print(len(speeches_queue))
+    if game_paused and len(speeches_queue) > 0:
 
+        speech = speeches_queue[0]
+        lines = split_speech_into_lines(speech)
         dialogue.draw(screen)
-
         font = pg.font.Font(None, 28)
-        text = font.render("Bem vindo ao Privacy Defender, onde seu objetivo é defender a sua privacidade", True, (255, 255, 255))
+        text = font.render(lines["first_line"], True, (255, 255, 255))
         text_rect = text.get_rect(center=(575, 550))
         screen.blit(text, text_rect)
 
-        # Segundo pedaço do texto
-        text2 = font.render("de ameaças que querem comprometê-la!", True, (255, 255, 255))
-        text2_rect = text2.get_rect(center=(490, 590))
-        screen.blit(text2, text2_rect)
+        #Segundo pedaço do texto
+        if(lines["has_second_line"]):
+            text2 = font.render(lines["second_line"], True, (255, 255, 255))
+            text2_rect = text2.get_rect(center=(490, 590))
+            screen.blit(text2, text2_rect)
+
+        if(lines["has_third_line"]):
+            text3 = font.render(lines["third_line"], True, (255, 255, 255))
+            text3_rect = text3.get_rect(center=(490, 630))
+            screen.blit(text3, text3_rect)
 
         if pg.mouse.get_pressed()[0] == 1:
+            #reset mouse pressed
+            time.sleep(0.1)
             # Segundo pedaço do texto
-            text3 = font.render("ALO", True, (255, 255, 255))
-            text3_rect = text3.get_rect(center=(490, 590))
-            screen.blit(text3, text3_rect)
+            popet = speeches_queue.pop(0)
+            print("Alo", popet)
+            print(len(speeches_queue))
+
+
         #TODO arrumar a fala
         #TODO por uma seta
 
-
-        #turret_group[0].draw(screen)
-        # show information when click
-        if pg.mouse.get_pressed()[0] == 1:
-            game_paused = False  # return game
+        print("TESTE")
 
     else:
-
+        game_paused=0
         # update groups
         enemy_group.update()  # para lidar com vários inimigos
         turret_group.update(enemy_group)
