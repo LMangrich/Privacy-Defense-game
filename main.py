@@ -117,50 +117,17 @@ dialogue = CharacterDialogue(images.character_one, images.footer_image, 90, cons
 
 game_paused = True
 
-def show_instructions(): #TODO ver sobre o texto
-    font = pg.font.Font(None, 36)
-    text = font.render("Clique para começar", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.SCREEN_HEIGHT // 2))
-    screen.blit(text, text_rect)
-
-def load_character_dialogues():
-    with open("classes/character_impl/character_dialogue_data.json") as file:
-        data = json.load(file)
-    return data
-
-def showInstructionsFirstPart():
-    dialogue_data = load_character_dialogues()
-
-    for dialogue in dialogue_data:
-        dialogue_id = dialogue['dialogue_id']
-        dialogue_text = dialogue['dialogue']
-
-        if dialogue_id == '6':
-            break
-
-        # Renderiza o texto do diálogo atual na tela
-        font = pg.font.Font(None, 36)
-        text_surface = font.render(dialogue_text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(
-            bottomright=(300, 300))
-
-        wait_for_click = True
-        while wait_for_click:
-            for event in pg.event.get():
-                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                    wait_for_click = False
-
 #############################
 # GAME START
 #############################
 
-# with open("classes/character_impl/character_dialogue_data.json") as file:
-#     speech_data = json.load(file)
-#
-# speeches = []
-#
-# for speech in speech_data:
-#     speeches.append(speech["dialogue"])
+with open("classes/character_impl/character_dialogue_data.json") as file:
+    speech_data = json.load(file)
+
+speeches = []
+
+for speech in speech_data:
+    speeches.append(speech["dialogue"])
 
 indice_texto = 0
 
@@ -202,7 +169,7 @@ while run:
         #turret_group[0].draw(screen)
         # show information when click
         if pg.mouse.get_pressed()[0] == 1:
-            pass #game_paused = False  # return game
+            game_paused = False  # return game
 
     else:
 
