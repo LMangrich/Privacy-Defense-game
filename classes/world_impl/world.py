@@ -11,7 +11,8 @@ class World:
         #look through data to extract relevant info
         for layer in self.level_data["layers"]:
             if layer["name"] == "Camada de Blocos 1":
-                self.tile_map = layer["data"]
+                tile_map_1d = layer["data"]
+                self.tile_map = [tile_map_1d[i:i + self.cons.COLUMNS] for i in range(0, len(tile_map_1d), self.cons.COLUMNS)]
             elif layer["name"] == "waypoints":
                 for obj in layer["objects"]:
                     coordinate_x = obj["x"]

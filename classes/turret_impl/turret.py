@@ -21,7 +21,7 @@ class Turret(pg.sprite.Sprite):
 
         # calculate center coordinates
         self.x = (self.tile_x + 0.5) * self.cons.TILE_SIZE  # para ficar no centro do tile
-        self.y = (self.tile_y + 0.35) * self.cons.TILE_SIZE
+        self.y = (self.tile_y + 0.35) * self.cons.TILE_SIZE  # ajustar para ficar no centro do tile
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
@@ -35,9 +35,6 @@ class Turret(pg.sprite.Sprite):
         self.range_rect = self.range_image.get_rect()
         self.range_rect.center = self.rect.center
 
-
-
-
     def update(self, enemy_group):
         # if target picked, play firing animation
         if self.target:
@@ -46,7 +43,7 @@ class Turret(pg.sprite.Sprite):
             if pg.time.get_ticks() - self.last_shot > self.cooldown:
                 self.pick_target(enemy_group)
 
-    #TODO arrumar sobre fire projectile_impl
+    # TODO arrumar sobre fire projectile_impl
 
     def pick_target(self, enemy_group):
         # find an enemy_impl to target

@@ -33,10 +33,10 @@ class CharacterDialogue(pg.sprite.Sprite):
         self.rect_turret_one.topleft = (259, 20) # x  e y #TODO arrumar e por as corretas
 
         self.rect_turret_two = turret_two.get_rect()
-        self.rect_turret_two.topleft  = (342, 20)  # x  e y
+        self.rect_turret_two.topleft  = (342, 17)  # x  e y
 
         self.rect_turret_three = turret_three.get_rect()
-        self.rect_turret_three.topleft  = (425, 20)  # x  e y
+        self.rect_turret_three.topleft  = (420, 17)  # x  e y
 
         # Text
         self.font = pg.font.Font(None, 36)
