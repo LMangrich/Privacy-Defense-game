@@ -4,7 +4,7 @@ import math
 
 
 class Enemy(pg.sprite.Sprite):  # o sprite class tem um draw method mesmo nao tendo explicito por conta do pygame
-    def __init__(self, waypoints, image):  # funciona como construtor da classe
+    def __init__(self, waypoints, image, health=100, on_reach_end=None):  # funciona como construtor da classe
         pg.sprite.Sprite.__init__(self)
         self.waypoints = waypoints
         self.pos = Vector2(self.waypoints[0])  # com isso consegue pegar as posiçoes, mas o pos é o inicial
@@ -15,6 +15,13 @@ class Enemy(pg.sprite.Sprite):  # o sprite class tem um draw method mesmo nao te
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()  # retorna um retângulo (Rect) que define a posição e as dimensões da imagem
         self.rect.center = self.pos
+        
+        # Health system
+        self.health = health
+        self.max_health = health
+        
+        # Callback when reaching end
+        self.on_reach_end = on_reach_end
 
     def update(self):
         self.move()
@@ -27,7 +34,10 @@ class Enemy(pg.sprite.Sprite):  # o sprite class tem um draw method mesmo nao te
             self.movement = self.target - self.pos  # distancia entre os 2 waypoints
         else:
             # enemy_impl has reached the end of the path
+            if self.on_reach_end:
+                self.on_reach_end()
             self.kill()
+            return
 
         # calculate distance to target
         dist = self.movement.length()
@@ -48,3 +58,9 @@ class Enemy(pg.sprite.Sprite):  # o sprite class tem um draw method mesmo nao te
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+
+    def take_damage(self, damage):
+        """Apply damage to enemy and remove if health reaches 0"""
+        self.health -= damage
+        if self.health <= 0:
+            self.kill()

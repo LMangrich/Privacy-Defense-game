@@ -1,10 +1,50 @@
 TURRET_DATA = [
-    { #1, 2, 3 torre
+    { # Antivirus
         "range": 90,
-        "cooldown": 1500
+        "cooldown": 500,
+        "damage": 50,
+        "cost": 50
     },
-    { #4, 5, 6, 7, 8 torre
+    { # Firewall
+        "range": 90,
+        "cooldown": 500,
+        "damage": 50,
+        "cost": 100
+    },
+    { # Strong Password
+        "range": 90,
+        "cooldown": 500,
+        "damage": 50,
+        "cost": 50
+    },
+    { # Filter Email
         "range": 120,
-        "cooldown": 1200
+        "cooldown": 500,
+        "damage": 25,
+        "cost": 100
+    },
+    { # USB Unknown
+        "range": 120,
+        "cooldown": 500,
+        "damage": 25,
+        "cost": 100
+    },
+    { # Unsafe Download
+        "range": 120,
+        "cooldown": 500,
+        "damage": 25,
+        "cost": 100
+    },
+    { # Adblock
+        "range": 120,
+        "cooldown": 500,
+        "damage": 25,
+        "cost": 100
+    },
+    { # Change Password
+        "range": 120,
+        "cooldown": 500,
+        "damage": 25,
+        "cost": 100
     }
 ]

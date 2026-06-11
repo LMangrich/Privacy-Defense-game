@@ -15,10 +15,10 @@ class CharacterDialogue(pg.sprite.Sprite):
         # check if game is up for explication
         self.game_explication = game_explication
 
-        # images
+        # images -- verificar se isso eh usado
         self.image_character = image_character
         self.rect_character = image_character.get_rect()
-        self.rect_character.center = (self.coordinate_x_character, self.coordinate_y_character)
+        self.rect_character.center = (self.coordinate_x_character + 10, self.coordinate_y_character + 3000)
 
         self.image_footer = image_footer
         self.rect_footer = image_footer.get_rect()
@@ -33,10 +33,10 @@ class CharacterDialogue(pg.sprite.Sprite):
         self.rect_turret_one.topleft = (259, 20) # x  e y #TODO arrumar e por as corretas
 
         self.rect_turret_two = turret_two.get_rect()
-        self.rect_turret_two.topleft  = (342, 17)  # x  e y
+        self.rect_turret_two.topleft  = (342, 20)  # x  e y
 
         self.rect_turret_three = turret_three.get_rect()
-        self.rect_turret_three.topleft  = (420, 17)  # x  e y
+        self.rect_turret_three.topleft  = (420, 20)  # x  e y
 
         # Text
         self.font = pg.font.Font(None, 36)
@@ -47,7 +47,7 @@ class CharacterDialogue(pg.sprite.Sprite):
             data = json.load(file)
         return data
     def showInstructionsFirstPart(self):
-        self.dialogue_data = self.load_character_dialogues()
+        self.dialogue_data = self.load_character_dialogues() #mexer aqui, acredito que seja nessa parte q nao mostra -- todo
 
         for dialogue in self.dialogue_data:
             dialogue_id = dialogue['dialogue_id']
@@ -66,11 +66,14 @@ class CharacterDialogue(pg.sprite.Sprite):
                     if event.type == pg.MOUSEBUTTONDOWN and event.button ==1:
                             wait_for_click = False
 
-    def draw(self, surface):
+    def draw(self, surface, level=1, show_towers=True):
         if self.game_explication:
             surface.blit(self.image_footer, self.rect_footer)
             surface.blit(self.image_character, self.rect_character)
-            surface.blit(self.turret_one, self.rect_turret_one)
-            surface.blit(self.turret_two, self.rect_turret_two)
-            surface.blit(self.turret_three, self.rect_turret_three)
+            if show_towers:
+                surface.blit(self.turret_one, self.rect_turret_one)
+                if level >= 2:
+                    surface.blit(self.turret_two, self.rect_turret_two)
+                if level >= 3:
+                    surface.blit(self.turret_three, self.rect_turret_three)
             #surface.blit(self.text_surface, self.text_rect)

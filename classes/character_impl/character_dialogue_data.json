@@ -1,30 +1,60 @@
-[
+{
+  "levels": [
     {
-        "dialogue_id": 1,
-        "dialogue": "Bem vindo ao Privacy Defender, onde seu objetivo é defender a sua privacidade de ameaças que querem comprometê-la!"
+      "level": 1,
+      "tower": "Antivírus",
+      "tower_name": "Antivírus",
+      "intro_dialogues": [
+        "Bem vindo ao Privacy Defender, onde seu objetivo é defender a sua privacidade de ameaças que querem comprometê-la!",
+        "O círculo indica por onde a ameaça irá passar.",
+        "E aqui ficarão suas torres de defesa para proteger os seus dados."
+      ],
+      "tower_explanation": [
+        "Nesta primeira torre de defesa podemos identificar o Antivírus, que nos ajudam a detectar intrusos maliciosos em nossas máquinas e a erradicar essas ameaças.\nEssa medida de segurança é fundamental para a construção de um ambiente seguro."
+      ],
+      "enemy_intro": "Ah não, aqui vem o Phishing!",
+      "victory_dialogue": [
+        "Parabéns! Você defendeu seu computador contra o Phishing! Mantenha suas defesas atualizadas e sempre desconfie de mensagens suspeitas."
+      ],
+      "defeat_dialogue": [
+        "Ah, não! O computador foi invadido pelo Phishing! Mas não se preocupe, é importante sempre tentar novamente. O Phishing é um ataque comum, e com as defesas corretas, você consegue se proteger. Vamos tentar novamente!"
+      ]
     },
     {
-        "dialogue_id": 2,
-        "dialogue": "Aqui são onde ficarão suas torres de defesa contra seus dados. São as medidas gerais! Proteções que ajudam a assegurar sua privacidade na maioria dos casos.\nComece com elas para criar uma base de proteção sólida antes que os ataques específicos cheguem ao seu computador."
+      "level": 2,
+      "tower": "Firewall",
+      "tower_name": "Firewall",
+      "intro_dialogues": [
+        "Excelente trabalho na primeira defesa! Agora vamos aprender sobre o Firewall, uma barreira essencial contra intrusos não autorizados."
+      ],
+      "tower_explanation": [
+        "O Firewall monitora e controla o tráfego de rede, bloqueando conexões suspeitas. Manter o firewall ativo é fundamental para uma segurança robusta."
+      ],
+      "enemy_intro": "Atenção! Um novo tipo de ameaça aproxima-se!",
+      "victory_dialogue": [
+        "Fantástico! Você dominou a defesa contra esta ameaça! O conhecimento em segurança é essencial para proteger sua privacidade."
+      ],
+      "defeat_dialogue": [
+        "Ah, não! O computador foi invadido novamente! Mas cada tentativa é uma oportunidade de aprender. Entender as ameaças e como se defender é o caminho para a verdadeira proteção. Vamos tentar novamente com novas estratégias!"
+      ]
     },
     {
-        "dialogue_id": 3,
-        "dialogue": "Nesta primeira torre de defesa podemos identificar o Antivírus, que nos ajudam a detectar intrusos maliciosos em nossas máquinas e a erradicar essas ameaças.\nEssa medida de segurança é fundamental para a construção de um ambiente seguro."
-    },
-    {
-        "dialogue_id": 4,
-        "dialogue": "Já na segunda torre de defesa, temos O firewall. Manter os softwares atualizados garante que novos métodos de proteção sejam postos em funcionamento./nAlém disso, aumenta as chances de vulnerabilidades antigas já terem sido descobertas e corrigidas."
-    },
-    {
-        "dialogue_id": 5,
-        "dialogue": "Na terceira torre, observamos a Senha Forte! Ter uma boa educação quando se trata de utilizar meios tecnológicos é fundamental para evitar a invasão de sua privacidade.\nEssa medida tomada pelo usuário vai desde não clicar em links suspeitos até não expor dados e informações sigilosas em redes sociais. É importante lembrar que a internet não é completamente confidencial e anônima!"
-    },
-    {
-        "dialogue_id": 6,
-        "dialogue": "Vemos nossa primeira ameaça, o Phising! Phishing é como são chamadas as tentativas de conseguir suas informações sigilosas, como senhas ou informações bancárias por meio de engenharia social.\n A engenharia social seria se passar por pessoas em que você confia ou por instituições de renome. Por isso sempre desconfie de um e-mail ou mensagem pedindo suas informações pessoais\n É melhor prevenir do que remediar!"
-    },
-    {
-        "dialogue_id": 7,
-        "dialogue": "Oh não! O Phising acabou chegando até o computador! Para evitar que isso aconteça, basta posicionar suas torres no mapa e eliminar a ameaça!"
+      "level": 3,
+      "tower": "Senha Forte",
+      "tower_name": "Senha Forte",
+      "intro_dialogues": [
+        "Você está progredindo bem! Agora vamos explorar um dos aspectos mais importantes: a criação de Senhas Fortes."
+      ],
+      "tower_explanation": [
+        "Uma senha forte é sua primeira linha de defesa contra acesso não autorizado. Use combinações de letras maiúsculas, minúsculas, números e símbolos. Não compartilhe suas senhas e mude-as regularmente."
+      ],
+      "enemy_intro": "Cuidado! Um novo ataque está por vir!",
+      "victory_dialogue": [
+        "Excelente! Você completou todos os níveis! Parabéns por sua dedicação à proteção de sua privacidade digital. Lembre-se: estar seguro é um processo contínuo!"
+      ],
+      "defeat_dialogue": [
+        "Ah, não! O computador foi comprometido! Mas essa é uma lição valiosa. A segurança requer constante vigilância e atualização das defesas. Vamos tentar mais uma vez com a compreensão adquirida!"
+      ]
     }
-]
+  ]
+}
