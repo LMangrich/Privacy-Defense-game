@@ -1,3 +1,7 @@
+# Ative para imprimir mensagens de debug no console
+DEBUG = False
+
+
 class Constants:
     def __init__(self):
         self.ROWS = 13
