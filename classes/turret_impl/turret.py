@@ -1,15 +1,20 @@
 import pygame as pg
 import math
 
+from constants.constants import DEBUG
 from .turret_data import TURRET_DATA
 from ..projectile_impl.projectile import Projectile
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, image, tile_x, tile_y, constants, images, game_variables=None):
+    def __init__(self, image, tile_x, tile_y, constants, images, game_variables=None, turret_index=0):
         pg.sprite.Sprite.__init__(self)
-        self.check_turret = 1
-        self.range = TURRET_DATA[self.check_turret - 1].get("range")
-        self.cooldown = TURRET_DATA[self.check_turret - 1].get("cooldown")
+        # Mantido por compatibilidade; turret_index define qual torre do TURRET_DATA usar
+        self.turret_index = turret_index
+        self.check_turret = turret_index + 1
+        turret_stats = TURRET_DATA[turret_index]
+        self.range = turret_stats.get("range")
+        self.cooldown = turret_stats.get("cooldown")
+        self.damage = turret_stats.get("damage", 25)
         self.selected = False
         self.target = None
         self.last_shot = pg.time.get_ticks()
@@ -61,11 +66,12 @@ class Turret(pg.sprite.Sprite):
     def fire(self, projectile_group):
         """Create and fire a projectile at the target"""
         if self.target:
-            projectile = Projectile(self.x, self.y, self.target.pos[0], self.target.pos[1], self.target, 25, self.game_variables)
+            projectile = Projectile(self.x, self.y, self.target.pos[0], self.target.pos[1], self.target, self.damage, self.game_variables)
             projectile_group.add(projectile)
             self.last_shot = pg.time.get_ticks()
             self.target = None
-            print(f"Turret fired! Damage: 25")
+            if DEBUG:
+                print(f"Turret fired! Damage: {self.damage}")
 
     def pick_target(self, enemy_group):
         # find an enemy_impl to target
@@ -78,7 +84,8 @@ class Turret(pg.sprite.Sprite):
             dist = math.sqrt(x_dist ** 2 + y_dist ** 2)
             if dist < self.range:
                 self.target = enemy
-                print("Target selected")
+                if DEBUG:
+                    print("Target selected")
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
