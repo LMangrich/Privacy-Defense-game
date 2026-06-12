@@ -9,7 +9,7 @@ class GameVariables:
         self.max_health = 100
         
         # Currency system
-        self.player_currency = 200
+        self.player_currency = 100
 
     def take_damage(self, amount):
         self.computer_health = max(0, self.computer_health - amount)
