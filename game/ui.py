@@ -1,6 +1,87 @@
 import pygame as pg
 
 
+def _wrap_text(font, text, max_width):
+    """Quebra o texto em linhas que cabem em max_width pixels."""
+    lines = []
+    current = ""
+    for word in text.split():
+        test = f"{current} {word}".strip()
+        if font.size(test)[0] <= max_width:
+            current = test
+        else:
+            if current:
+                lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines
+
+
+def draw_turret_tooltip(screen, cons, turret_info):
+    """Desenha uma caixa explicativa perto de um botão de torre.
+
+    turret_info: dict com 'name', 'desc', 'cost', 'damage', 'range' e o
+    'rect' do botão sobre o qual o mouse está.
+    """
+    anchor = turret_info["rect"]
+    font_title = pg.font.Font(None, 24)
+    font_body = pg.font.Font(None, 20)
+
+    padding = 10
+    box_width = 240
+    max_text_width = box_width - 2 * padding
+
+    title_surface = font_title.render(turret_info["name"], True, (255, 215, 0))
+    desc_lines = _wrap_text(font_body, turret_info["desc"], max_text_width)
+    stats_text = (
+        f"Custo: {turret_info['cost']}   "
+        f"Dano: {turret_info['damage']}   "
+        f"Alcance: {turret_info['range']}"
+    )
+    stats_lines = _wrap_text(font_body, stats_text, max_text_width)
+
+    line_h = font_body.get_height() + 2
+    box_height = (
+        padding
+        + title_surface.get_height() + 6
+        + len(desc_lines) * line_h
+        + 6
+        + len(stats_lines) * line_h
+        + padding
+    )
+
+    # Posiciona abaixo do botão; ajusta para não sair da tela.
+    box_x = anchor.centerx - box_width // 2
+    box_y = anchor.bottom + 22
+    box_x = max(6, min(box_x, cons.SCREEN_WIDTH - box_width - 6))
+    if box_y + box_height > cons.UPPER_PANEL + cons.MAP_HEIGHT:
+        box_y = anchor.top - box_height - 8
+
+    box_rect = pg.Rect(box_x, box_y, box_width, box_height)
+
+    # Fundo semitransparente com borda.
+    surface = pg.Surface((box_width, box_height), pg.SRCALPHA)
+    surface.fill((18, 24, 30, 235))
+    pg.draw.rect(surface, (255, 215, 0), surface.get_rect(), width=2, border_radius=8)
+    screen.blit(surface, box_rect.topleft)
+
+    y = box_y + padding
+    screen.blit(title_surface, (box_x + padding, y))
+    y += title_surface.get_height() + 6
+
+    for line in desc_lines:
+        text = font_body.render(line, True, (230, 230, 230))
+        screen.blit(text, (box_x + padding, y))
+        y += line_h
+
+    y += 6
+    for line in stats_lines:
+        text = font_body.render(line, True, (140, 200, 255))
+        screen.blit(text, (box_x + padding, y))
+        y += line_h
+
+
 def draw_ui(screen, cons, game_variables):
     font_small = pg.font.Font(None, 24)
 
