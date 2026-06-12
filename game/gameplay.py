@@ -1,9 +1,11 @@
 import pygame as pg
 
+from constants.constants import DEBUG
 from classes.enemy_impl.enemy import Enemy
 from classes.enemy_impl.enemy_data import ENEMY_DATA
 from classes.turret_impl.turret import Turret
 from classes.turret_impl.turret_data import TURRET_DATA
+from game.level_config import get_level_config, enemy_image_attr
 
 
 def on_enemy_reach_end(game_variables):
@@ -30,13 +32,14 @@ def create_turret(mouse_pos, turret_type, cons, world, turret_group, game_variab
             break
 
     if selected_zone is None:
-        return
+        return "no_zone"
 
     # 3. Derive tile indices cleanly from map-relative space
     mouse_tile_x = int(selected_zone.centerx // cons.TILE_SIZE)
     mouse_tile_y = int(selected_zone.centery // cons.TILE_SIZE)
 
-    print(f"[DEBUG] Zone Found! Map-relative Center: ({selected_zone.centerx}, {selected_zone.centery}) | Grid Tile: ({mouse_tile_x}, {mouse_tile_y})")
+    if DEBUG:
+        print(f"[DEBUG] Zone Found! Map-relative Center: ({selected_zone.centerx}, {selected_zone.centery}) | Grid Tile: ({mouse_tile_x}, {mouse_tile_y})")
 
     # 4. Check occupancy
     zone_occupied = any(
@@ -44,8 +47,9 @@ def create_turret(mouse_pos, turret_type, cons, world, turret_group, game_variab
         for turret in turret_group
     )
     if zone_occupied:
-        print(f"[DEBUG] Placement blocked: Tile ({mouse_tile_x}, {mouse_tile_y}) occupied.")
-        return
+        if DEBUG:
+            print(f"[DEBUG] Placement blocked: Tile ({mouse_tile_x}, {mouse_tile_y}) occupied.")
+        return "occupied"
 
     # 5. Check currency - map turret type to data index
     turret_type_map = {
@@ -62,14 +66,17 @@ def create_turret(mouse_pos, turret_type, cons, world, turret_group, game_variab
     turret_cost = TURRET_DATA[turret_data_index]["cost"]
     
     if game_variables.player_currency < turret_cost:
-        print(f"[DEBUG] Insufficient funds: Needs {turret_cost}, Player has {game_variables.player_currency}")
-        return
+        if DEBUG:
+            print(f"[DEBUG] Insufficient funds: Needs {turret_cost}, Player has {game_variables.player_currency}")
+        return "no_funds"
 
     # 6. Instantiate turret
-    new_turret = Turret(turret_type, mouse_tile_x, mouse_tile_y, cons, images, game_variables)
+    new_turret = Turret(turret_type, mouse_tile_x, mouse_tile_y, cons, images, game_variables, turret_data_index)
     turret_group.add(new_turret)
     game_variables.player_currency -= turret_cost
-    print(f"[DEBUG] Turret placed at grid tile ({mouse_tile_x}, {mouse_tile_y})")
+    if DEBUG:
+        print(f"[DEBUG] Turret placed at grid tile ({mouse_tile_x}, {mouse_tile_y})")
+    return "placed"
 
     
 def select_turret(mouse_pos, cons, turret_group):
@@ -87,14 +94,12 @@ def clear_selection(turret_group):
 
 
 def spawn_enemy_wave(current_level, level_start_time, enemy_wave_spawned, images, world, enemy_group, game_variables):
-    # Define max enemies por nível
-    max_enemies_by_level = {
-        1: 8,
-        2: 12,
-        3: 15,
-    }
-    max_enemies = max_enemies_by_level.get(current_level, 10)
-    
+    # Config da fase (mapa, inimigo, máximo de inimigos, torres)
+    config = get_level_config(current_level)
+    max_enemies = config["max_enemies"]
+    enemy_type = config["enemy"]
+    enemy_image = getattr(images, enemy_image_attr(current_level))
+
     current_time = pg.time.get_ticks()
     time_elapsed = (current_time - level_start_time) / 1000.0
 
@@ -102,26 +107,14 @@ def spawn_enemy_wave(current_level, level_start_time, enemy_wave_spawned, images
         enemies_to_spawn = min(2, int(time_elapsed * 2) + 1)
     else:
         enemies_to_spawn = 2 + int((time_elapsed - 1.0) / 3.0) + 1
-    
+
     # Limita ao máximo de inimigos do nível
     enemies_to_spawn = min(enemies_to_spawn, max_enemies)
 
     while enemy_wave_spawned < enemies_to_spawn:
-        if current_level == 1:
-            enemy_image = images.phishing_enemy
-            enemy_type = "phishing"
-        elif current_level == 2:
-            enemy_image = images.keylogger_enemy
-            enemy_type = "keylogger"
-        elif current_level == 3:
-            enemy_image = images.spyware_enemy
-            enemy_type = "spyware"
-        else:
-            enemy_image = images.phishing_enemy
-            enemy_type = "phishing"
-
         enemy_health = ENEMY_DATA[enemy_type]["health"]
-        enemy = Enemy(world.waypoints, enemy_image, health=enemy_health, on_reach_end=lambda: on_enemy_reach_end(game_variables))
+        enemy_speed = ENEMY_DATA[enemy_type]["speed"]
+        enemy = Enemy(world.waypoints, enemy_image, health=enemy_health, on_reach_end=lambda: on_enemy_reach_end(game_variables), speed=enemy_speed)
         enemy_group.add(enemy)
         enemy_wave_spawned += 1
 
