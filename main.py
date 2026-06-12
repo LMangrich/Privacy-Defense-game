@@ -18,6 +18,9 @@ from game.gameplay import (
 )
 from game.ui import draw_ui
 from game.ui import draw_dialogue_footer
+from game.ui import draw_turret_tooltip
+from game import level_config
+from classes.turret_impl.turret_data import TURRET_DATA
 
 #############################
 # PYGAME LIB START
@@ -55,11 +58,18 @@ dialogue = CharacterDialogue(
 # MAP & WORLD
 #############################
 
-with open("assets/images/levels/firstLevel.json") as file:
-    world_data = json.load(file)
+world = None
 
-world = World(world_data, images.map_image, images.headerMap, cons)
-world.process_data()
+
+def load_level_world(level):
+    """Carrega o mapa (imagem + JSON) da fase e recria o mundo."""
+    global world
+    images.map_image = pg.image.load(level_config.map_image_path(level)).convert_alpha()
+    with open(level_config.map_json_path(level), encoding="utf-8") as file:
+        world_data = json.load(file)
+    world = World(world_data, images.map_image, images.headerMap, cons)
+    world.process_data()
+
 
 #############################
 # GAME STATE
@@ -78,6 +88,10 @@ game_over_message = ""
 showing_game_over = False
 game_over_time = None
 victory_message = ""
+paused = False
+pause_started_at = None
+feedback_message = ""
+feedback_message_time = 0
 
 #############################
 # LOAD DIALOGUE DATA
@@ -87,6 +101,9 @@ all_dialogue_data = load_all_dialogues("classes/character_impl/character_dialogu
 current_dialogue_data = load_level_dialogue(all_dialogue_data, current_level)
 intro_sequence = current_dialogue_data.get("intro_dialogues", []) + current_dialogue_data.get("tower_explanation", [])
 
+# Carrega o mapa da primeira fase
+load_level_world(current_level)
+
 #############################
 # GAME FUNCTIONS
 #############################
@@ -94,6 +111,9 @@ intro_sequence = current_dialogue_data.get("intro_dialogues", []) + current_dial
 def apply_reset(level):
     global game_state, dialogue_index, enemy_wave_spawned, showing_game_over
     global game_over_message, current_dialogue_data, intro_sequence, level_start_time, victory_message
+
+    # Recarrega o mapa correspondente à fase (muda ao avançar de nível)
+    load_level_world(level)
 
     reset_data = reset_level(
         level,
@@ -143,7 +163,7 @@ def draw_tower_placement_hints():
 
 def draw_tower_button_highlight(level):
     button_list = list(turret_buttons.keys())
-    tower_index = min(max(level - 1, 0), 2)
+    tower_index = min(max(level - 1, 0), len(button_list) - 1)
     if tower_index < len(button_list):
         target_button = button_list[tower_index]
         center = target_button.rect.center
@@ -172,10 +192,66 @@ def draw_tower_costs():
     for visual_index, (button, turret_type) in enumerate(get_unlocked_turret_buttons(current_level)):
         tower_data_index = tower_index_map.get(visual_index, 0)
         cost = TURRET_DATA[tower_data_index]["cost"]
-        
-        cost_text = font_cost.render(str(cost), True, (255, 215, 0))
+
+        affordable = game_variables.player_currency >= cost
+        cost_color = (255, 215, 0) if affordable else (130, 130, 130)
+        cost_text = font_cost.render(str(cost), True, cost_color)
         cost_rect = cost_text.get_rect(center=(button.rect.centerx + 25, button.rect.bottom + 10))
         screen.blit(cost_text, cost_rect)
+
+
+def get_cursor_turret_index(turret_type):
+    """Mapeia a imagem do cursor de torre para o indice no TURRET_DATA."""
+    cursor_to_index = {
+        images.cursor_get_antivirus: 0,
+        images.cursor_get_firewall: 1,
+        images.cursor_get_strong_password: 2,
+        images.cursor_get_filter_email: 3,
+        images.cursor_get_usb_unknown: 4,
+        images.cursor_get_unsafe_download: 5,
+        images.cursor_get_adblock: 6,
+        images.cursor_get_change_password: 7,
+    }
+    return cursor_to_index.get(turret_type, 0)
+
+
+def draw_placement_overlay():
+    """Destaca as zonas validas e mostra o alcance da torre durante a colocacao."""
+    if not game_variables.placing_turrets:
+        return
+    from classes.turret_impl.turret_data import TURRET_DATA
+
+    draw_tower_placement_hints()
+
+    cursor_pos = pg.mouse.get_pos()
+    if cursor_pos[1] >= cons.UPPER_PANEL:
+        turret_index = get_cursor_turret_index(game_variables.current_turret_type)
+        turret_range = TURRET_DATA[turret_index]["range"]
+        range_overlay = pg.Surface((turret_range * 2, turret_range * 2), pg.SRCALPHA)
+        pg.draw.circle(range_overlay, (255, 255, 255, 45), (turret_range, turret_range), turret_range)
+        pg.draw.circle(range_overlay, (255, 255, 255, 130), (turret_range, turret_range), turret_range, 2)
+        screen.blit(range_overlay, (cursor_pos[0] - turret_range, cursor_pos[1] - turret_range))
+
+
+def show_feedback(message):
+    """Exibe uma mensagem temporaria no topo do mapa."""
+    global feedback_message, feedback_message_time
+    feedback_message = message
+    feedback_message_time = pg.time.get_ticks()
+
+
+def toggle_pause():
+    """Alterna o pause durante a partida, descontando o tempo parado do spawn."""
+    global paused, pause_started_at, level_start_time
+    if game_state != "playing":
+        return
+    paused = not paused
+    if paused:
+        pause_started_at = pg.time.get_ticks()
+    else:
+        if pause_started_at is not None and level_start_time is not None:
+            level_start_time += pg.time.get_ticks() - pause_started_at
+        pause_started_at = None
 
 #############################
 # BUTTONS
@@ -198,13 +274,44 @@ turret_buttons = {
 
 def get_unlocked_turret_buttons(level):
     ordered_items = list(turret_buttons.items())
-    unlocked_count_by_level = {
-        1: 1,
-        2: 2,
-        3: 3,
-    }
-    unlocked_count = unlocked_count_by_level.get(level, 3)
+    unlocked_count = level_config.get_level_config(level)["unlocked_towers"]
     return ordered_items[:unlocked_count]
+
+
+def draw_hovered_turret_tooltip():
+    """Mostra a explicação da torre quando o mouse passa sobre o botão."""
+    mouse_pos = pg.mouse.get_pos()
+    for index, (button, _turret_type) in enumerate(get_unlocked_turret_buttons(current_level)):
+        if button.rect.collidepoint(mouse_pos):
+            data = TURRET_DATA[index]
+            draw_turret_tooltip(screen, cons, {
+                "name": data["name"],
+                "desc": data["desc"],
+                "cost": data["cost"],
+                "damage": data["damage"],
+                "range": data["range"],
+                "rect": button.rect,
+            })
+            break
+
+
+def handle_turret_buttons():
+    """Desenha os botões de torre e alterna o modo de posicionamento.
+
+    Clicar num botão seleciona a torre; clicar no mesmo botão novamente
+    cancela a seleção (desseleciona)."""
+    for button, turret_type in get_unlocked_turret_buttons(current_level):
+        if button.draw(screen):
+            already_selected = (
+                game_variables.placing_turrets
+                and game_variables.current_turret_type == turret_type
+            )
+            if already_selected:
+                game_variables.placing_turrets = False
+                game_variables.current_turret_type = None
+            else:
+                game_variables.placing_turrets = True
+                game_variables.current_turret_type = turret_type
 
 #############################
 # MAIN GAME LOOP
@@ -224,24 +331,25 @@ while run:
     
     world.draw(screen)
     information.draw(screen)
-    pause.draw(screen)
+    if pause.draw(screen):
+        toggle_pause()
     
     if game_state == "dialogue_intro":
         # Desenha torres colocadas durante diálogo
         enemy_group.draw(screen)
+        for enemy in enemy_group:
+            enemy.draw_health_bar(screen)
         projectile_group.draw(screen)
         for turret in turret_group:
             turret.draw(screen)
         
         # Permite colocação de torres durante diálogo
-        for button, turret_type in get_unlocked_turret_buttons(current_level):
-            if button.draw(screen):
-                game_variables.placing_turrets = True
-                game_variables.current_turret_type = turret_type
-        
+        handle_turret_buttons()
+
         draw_tower_costs()
 
         if game_variables.placing_turrets:
+            draw_placement_overlay()
             cursor_rect = game_variables.current_turret_type.get_rect()
             cursor_pos = pg.mouse.get_pos()
             cursor_rect.center = cursor_pos
@@ -249,7 +357,9 @@ while run:
                 screen.blit(game_variables.current_turret_type, cursor_rect)
             if pg.mouse.get_pressed()[2] == 1:
                 game_variables.placing_turrets = False
-        
+
+        draw_ui(screen, cons, game_variables)
+
         if dialogue_index < len(current_dialogue_data.get("intro_dialogues", [])):
             footer_text = current_dialogue_data["intro_dialogues"][dialogue_index]
             if dialogue_index == 1:
@@ -279,14 +389,12 @@ while run:
         for turret in turret_group:
             turret.draw(screen)
 
-        for button, turret_type in get_unlocked_turret_buttons(current_level):
-            if button.draw(screen):
-                game_variables.placing_turrets = True
-                game_variables.current_turret_type = turret_type
+        handle_turret_buttons()
 
         draw_tower_costs()
 
         if game_variables.placing_turrets:
+            draw_placement_overlay()
             cursor_rect = game_variables.current_turret_type.get_rect()
             cursor_pos = pg.mouse.get_pos()
             cursor_rect.center = cursor_pos
@@ -296,48 +404,49 @@ while run:
                 game_variables.placing_turrets = False
 
         draw_ui(screen, cons, game_variables)
-    
+
     elif game_state == "playing":
-        enemy_wave_spawned = spawn_enemy_wave(
-            current_level,
-            level_start_time,
-            enemy_wave_spawned,
-            images,
-            world,
-            enemy_group,
-            game_variables,
-        )
-        
-        enemy_group.update()
-        turret_group.update(enemy_group, projectile_group)
-        projectile_group.update()
-        
-        if game_variables.computer_health <= 0:
-            game_state = "game_over"
-            showing_game_over = True
-            game_over_time = pg.time.get_ticks()
-            game_over_message = current_dialogue_data["defeat_dialogue"][0]
-        
-        if len(enemy_group) == 0 and enemy_wave_spawned > 0 and game_variables.computer_health > 0:
-            victory_message = current_dialogue_data.get("victory_dialogue", ["Nível concluído!"])[0]
-            game_state = "victory_dialogue"
-        
+        if not paused:
+            enemy_wave_spawned = spawn_enemy_wave(
+                current_level,
+                level_start_time,
+                enemy_wave_spawned,
+                images,
+                world,
+                enemy_group,
+                game_variables,
+            )
+
+            enemy_group.update()
+            turret_group.update(enemy_group, projectile_group)
+            projectile_group.update()
+
+            if game_variables.computer_health <= 0:
+                game_state = "game_over"
+                showing_game_over = True
+                game_over_time = pg.time.get_ticks()
+                game_over_message = current_dialogue_data["defeat_dialogue"][0]
+
+            if len(enemy_group) == 0 and enemy_wave_spawned > 0 and game_variables.computer_health > 0:
+                victory_message = current_dialogue_data.get("victory_dialogue", ["Nível concluído!"])[0]
+                game_state = "victory_dialogue"
+
         if game_variables.selected_turret:
             game_variables.selected_turret.selected = True
         
         enemy_group.draw(screen)
+        for enemy in enemy_group:
+            enemy.draw_health_bar(screen)
         projectile_group.draw(screen)
         for turret in turret_group:
             turret.draw(screen)
         
-        for button, turret_type in get_unlocked_turret_buttons(current_level):
-            if button.draw(screen):
-                game_variables.placing_turrets = True
-                game_variables.current_turret_type = turret_type
-        
+        handle_turret_buttons()
+
         draw_tower_costs()
-        
+
         if game_variables.placing_turrets:
+            draw_placement_overlay()
             cursor_rect = game_variables.current_turret_type.get_rect()
             cursor_pos = pg.mouse.get_pos()
             cursor_rect.center = cursor_pos
@@ -348,7 +457,16 @@ while run:
         
         draw_ui(screen, cons, game_variables)
         footer_text = current_dialogue_data.get("enemy_intro", "")
-    
+
+        if paused:
+            pause_overlay = pg.Surface((cons.SCREEN_WIDTH, cons.MAP_HEIGHT), pg.SRCALPHA)
+            pause_overlay.fill((0, 0, 0, 120))
+            screen.blit(pause_overlay, (0, cons.UPPER_PANEL))
+            font_pause = pg.font.Font(None, 72)
+            pause_text = font_pause.render("PAUSADO", True, (255, 255, 255))
+            pause_rect = pause_text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.UPPER_PANEL + cons.MAP_HEIGHT // 2))
+            screen.blit(pause_text, pause_rect)
+
     elif game_state == "victory_dialogue":
         footer_text = victory_message
 
@@ -357,7 +475,7 @@ while run:
         continue_rect = continue_text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.UPPER_PANEL + cons.MAP_HEIGHT // 2 + 70))
         screen.blit(continue_text, continue_rect)
 
-        if current_level == 3:
+        if current_level == level_config.TOTAL_LEVELS:
             font_end = pg.font.Font(None, 42)
             end_text = font_end.render("Parabéns! Você completou o jogo!", True, (255, 215, 0))
             end_rect = end_text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.UPPER_PANEL + cons.MAP_HEIGHT // 2 - 70))
@@ -371,6 +489,16 @@ while run:
             restart_text = font_restart.render("Pressione R para tentar novamente", True, (255, 255, 0))
             restart_rect = restart_text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.UPPER_PANEL + cons.MAP_HEIGHT // 2 + 70))
             screen.blit(restart_text, restart_rect)
+
+    # Tooltip da torre sob o mouse (por cima do mapa), nos estados com botões.
+    if game_state in {"dialogue_intro", "waiting_for_start", "playing"}:
+        draw_hovered_turret_tooltip()
+
+    if feedback_message and pg.time.get_ticks() - feedback_message_time < 1500:
+        font_feedback = pg.font.Font(None, 40)
+        fb_text = font_feedback.render(feedback_message, True, (255, 80, 80))
+        fb_rect = fb_text.get_rect(center=(cons.SCREEN_WIDTH // 2, cons.UPPER_PANEL + 40))
+        screen.blit(fb_text, fb_rect)
 
     draw_dialogue_footer(
         screen,
@@ -389,6 +517,12 @@ while run:
             game_state = "playing"
             level_start_time = pg.time.get_ticks()
 
+        if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            game_variables.placing_turrets = False
+
+        if event.type == pg.KEYDOWN and event.key == pg.K_p and game_state == "playing":
+            toggle_pause()
+
         if event.type == pg.KEYDOWN and event.key == pg.K_r and game_state == "game_over":
             apply_reset(current_level)
 
@@ -397,7 +531,7 @@ while run:
             # Se clicou no mapa, pode colocar torres
             if cons.UPPER_PANEL <= mouse_pos[1] < cons.UPPER_PANEL + cons.MAP_HEIGHT:
                 if game_variables.placing_turrets:
-                    create_turret(
+                    placement_result = create_turret(
                         mouse_pos,
                         game_variables.current_turret_type,
                         cons,
@@ -406,13 +540,17 @@ while run:
                         game_variables,
                         images,
                     )
+                    if placement_result == "no_funds":
+                        show_feedback("Moeda insuficiente!")
+                    elif placement_result == "occupied":
+                        show_feedback("Zona ja ocupada!")
             else:
                 # Se clicou fora do mapa, avança diálogo
                 if dialogue_index < len(intro_sequence):
                     dialogue_index += 1
 
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and game_state == "victory_dialogue":
-            if current_level < 3:
+            if current_level < level_config.TOTAL_LEVELS:
                 current_level += 1
                 apply_reset(current_level)
             else:
@@ -424,7 +562,7 @@ while run:
                 game_variables.selected_turret = None
                 clear_selection(turret_group)
                 if game_variables.placing_turrets:
-                    create_turret(
+                    placement_result = create_turret(
                         mouse_pos,
                         game_variables.current_turret_type,
                         cons,
@@ -433,6 +571,10 @@ while run:
                         game_variables,
                         images,
                     )
+                    if placement_result == "no_funds":
+                        show_feedback("Moeda insuficiente!")
+                    elif placement_result == "occupied":
+                        show_feedback("Zona ja ocupada!")
                 else:
                     game_variables.selected_turret = select_turret(mouse_pos, cons, turret_group)
     
