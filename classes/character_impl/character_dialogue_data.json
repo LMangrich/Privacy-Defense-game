@@ -50,10 +50,46 @@
       ],
       "enemy_intro": "Cuidado! Um novo ataque está por vir!",
       "victory_dialogue": [
-        "Excelente! Você completou todos os níveis! Parabéns por sua dedicação à proteção de sua privacidade digital. Lembre-se: estar seguro é um processo contínuo!"
+        "Excelente! Você dominou as senhas fortes! Mas a jornada de proteção ainda não acabou. Prepare-se para novas ameaças!"
       ],
       "defeat_dialogue": [
         "Ah, não! O computador foi comprometido! Mas essa é uma lição valiosa. A segurança requer constante vigilância e atualização das defesas. Vamos tentar mais uma vez com a compreensão adquirida!"
+      ]
+    },
+    {
+      "level": 4,
+      "tower": "Filtro de E-mail",
+      "tower_name": "Filtro de E-mail",
+      "intro_dialogues": [
+        "Você está se tornando um verdadeiro defensor digital! Agora vamos conhecer o Filtro de E-mail, que protege sua caixa de entrada de mensagens maliciosas."
+      ],
+      "tower_explanation": [
+        "O Filtro de E-mail analisa as mensagens recebidas e bloqueia spam, links perigosos e tentativas de golpe antes que cheguem até você. Desconfie sempre de anexos e remetentes desconhecidos."
+      ],
+      "enemy_intro": "Alerta! O Malvertising está chegando, escondido em anúncios!",
+      "victory_dialogue": [
+        "Muito bem! Você barrou o Malvertising! Anúncios maliciosos são uma armadilha comum, e suas defesas estão cada vez mais sólidas."
+      ],
+      "defeat_dialogue": [
+        "Ah, não! O Malvertising invadiu o sistema através de um anúncio! Lembre-se: evite clicar em propagandas suspeitas e mantenha um bloqueador ativo. Vamos tentar novamente!"
+      ]
+    },
+    {
+      "level": 5,
+      "tower": "Trocar Senhas",
+      "tower_name": "Trocar Senhas",
+      "intro_dialogues": [
+        "Este é o desafio final! A maior das ameaças se aproxima. Vamos usar todo o seu conhecimento para a defesa definitiva!"
+      ],
+      "tower_explanation": [
+        "Trocar senhas regularmente e usar autenticação em duas etapas são hábitos essenciais. Se um vazamento acontecer, senhas atualizadas reduzem muito o risco de acesso indevido aos seus dados."
+      ],
+      "enemy_intro": "Atenção máxima! O Vazamento de Dados (Data Breach) é a ameaça mais perigosa!",
+      "victory_dialogue": [
+        "Incrível! Você derrotou o Vazamento de Dados e completou todas as fases! Parabéns por sua dedicação à proteção da sua privacidade digital. Lembre-se: estar seguro é um processo contínuo!"
+      ],
+      "defeat_dialogue": [
+        "Ah, não! Seus dados foram vazados! Esta é a ameaça mais séria de todas. Combine todas as defesas que aprendeu e tente novamente. Você consegue proteger sua privacidade!"
       ]
     }
   ]
