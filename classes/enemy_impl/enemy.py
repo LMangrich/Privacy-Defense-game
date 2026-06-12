@@ -4,12 +4,12 @@ import math
 
 
 class Enemy(pg.sprite.Sprite):  # o sprite class tem um draw method mesmo nao tendo explicito por conta do pygame
-    def __init__(self, waypoints, image, health=100, on_reach_end=None):  # funciona como construtor da classe
+    def __init__(self, waypoints, image, health=100, on_reach_end=None, speed=2):  # funciona como construtor da classe
         pg.sprite.Sprite.__init__(self)
         self.waypoints = waypoints
         self.pos = Vector2(self.waypoints[0])  # com isso consegue pegar as posiçoes, mas o pos é o inicial
         self.target_waypoint = 1  # o vetor começa do 0, entao pega o 1 como sendo a prox posicao
-        self.speed = 2
+        self.speed = speed
         self.angle = 0
         self.original_image = image
         self.image = pg.transform.rotate(self.original_image, self.angle)
@@ -64,3 +64,18 @@ class Enemy(pg.sprite.Sprite):  # o sprite class tem um draw method mesmo nao te
         self.health -= damage
         if self.health <= 0:
             self.kill()
+
+    def draw_health_bar(self, surface):
+        """Desenha uma pequena barra de vida acima do inimigo quando ele esta ferido."""
+        if self.health >= self.max_health:
+            return
+
+        bar_width = 30
+        bar_height = 5
+        ratio = max(self.health, 0) / self.max_health
+        bar_x = int(self.pos[0] - bar_width / 2)
+        bar_y = int(self.rect.top - 8)
+
+        pg.draw.rect(surface, (60, 60, 60), (bar_x, bar_y, bar_width, bar_height))
+        bar_color = (0, 220, 0) if ratio > 0.5 else (255, 165, 0) if ratio > 0.25 else (220, 0, 0)
+        pg.draw.rect(surface, bar_color, (bar_x, bar_y, int(bar_width * ratio), bar_height))
